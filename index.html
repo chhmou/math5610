@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATH 5610/6610 · Introduction to Numerical Analysis · Fall 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16202b;
+    --ink-soft: #4b5866;
+    --aggie: #0f2439;
+    --accent: #1d4f8f;
+    --paper: #ffffff;
+    --hairline: #e3e7ec;
+    --wash: #f5f7f9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "STIX Two Text", Georgia, serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.65;
+    font-size: 17px;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  a:hover { border-bottom-color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .wrap { max-width: 700px; margin: 0 auto; padding: 0 24px; }
+
+  header { padding: 56px 0 0; }
+  h1 {
+    font-size: clamp(2rem, 5.5vw, 2.9rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0 0 6px;
+    color: var(--aggie);
+    letter-spacing: -0.01em;
+  }
+  .subtitle { color: var(--ink-soft); font-size: 1.05rem; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 20px 28px;
+    padding: 26px 0;
+    margin-top: 28px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .facts dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .facts dd { font-size: 0.95rem; }
+
+  section { padding: 44px 0 0; }
+  h2 {
+    font-size: 0.82rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--aggie);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+  p + p { margin-top: 12px; }
+
+  ul.topics, ul.dates { list-style: none; }
+  ul.topics { columns: 2; column-gap: 40px; }
+  ul.topics li, ul.dates li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    break-inside: avoid;
+    font-size: 0.96rem;
+  }
+  ul.topics li::before, ul.dates li::before {
+    content: "";
+    position: absolute; left: 0; top: 0.85em;
+    width: 7px; height: 7px; border-radius: 50%;
+    border: 1.5px solid var(--accent);
+  }
+  @media (max-width: 560px) { ul.topics { columns: 1; } }
+
+  .grade { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; max-width: 460px; }
+  .grade .pct { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; text-align: right; }
+  .grade > div { padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+
+  table.scale { border-collapse: collapse; font-size: 0.9rem; margin-top: 18px; }
+  table.scale td {
+    padding: 5px 14px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  table.scale td.g { font-weight: 600; color: var(--aggie); }
+  table.scale td.r { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--ink-soft); }
+
+  /* lecture list */
+  .lectures { font-size: 0.93rem; }
+  .lectures .lec {
+    display: grid;
+    grid-template-columns: 34px 110px 1fr;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--hairline);
+    align-items: baseline;
+  }
+  .lectures .no { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-soft); }
+  .lectures .date { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; }
+  .lectures .off { color: var(--ink-soft); font-style: italic; }
+  .lectures .pending { color: var(--ink-soft); font-style: italic; }
+  .lectures .month {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--aggie);
+    padding: 22px 0 4px;
+  }
+  .lectures .month:first-child { padding-top: 0; }
+  @media (max-width: 480px) {
+    .lectures .lec { grid-template-columns: 28px 92px 1fr; gap: 8px; }
+  }
+
+  /* homework list */
+  .hw .lec { grid-template-columns: 34px 1fr auto auto; }
+  .hw .due { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-soft); }
+  @media (max-width: 480px) {
+    .hw .lec { grid-template-columns: 28px 1fr auto auto; }
+  }
+
+  .note {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    background: var(--wash);
+    padding: 14px 18px;
+    border-left: 3px solid var(--accent);
+    margin-top: 16px;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding: 26px 0 48px;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>MATH 5610/6610<br>Introduction to Numerical Analysis</h1>
+    <div class="subtitle">Fall 2026 · Dr.&nbsp;Changhong&nbsp;Mou</div>
+
+    <dl class="facts">
+      <div>
+        <dt>Meetings</dt>
+        <dd>MWF 10:30–11:20 a.m.<br>Old Main 203<br>Aug 31 – Dec 11, 2026</dd>
+      </div>
+      <div>
+        <dt>Office hours</dt>
+        <dd>Mon 2:00–3:00 p.m.<br>Wed 3:00–4:00 p.m.<br>Geology 417B, or by appointment</dd>
+      </div>
+      <div>
+        <dt>Contact</dt>
+        <dd><a href="mailto:changhong.mou@usu.edu">changhong.mou@usu.edu</a><br><a href="https://sites.google.com/view/cmou/home">homepage</a></dd>
+      </div>
+    </dl>
+  </header>
+
+  <section id="about">
+    <h2>Course description</h2>
+    <p>A graduate-level course on the theory and practice of numerical algorithms. The course develops the mathematical foundations of scientific computing: direct methods for linear systems (LU factorization with pivoting), Newton's method for systems of nonlinear equations and its convergence theory, floating-point arithmetic and rounding error analysis, conditioning of problems and stability of algorithms, polynomial and spline interpolation (including B-splines), numerical integration (Newton–Cotes, Gaussian, and adaptive quadrature), and the computation of eigenvalues via unitary similarity transformations and the QR algorithm. Emphasis is placed on rigorous error analysis — in particular the interplay between the conditioning of a problem and the backward stability of an algorithm — alongside efficient implementation.</p>
+    <p><strong>Prerequisites.</strong> Linear algebra and advanced calculus/introductory analysis at the undergraduate level; an undergraduate course in numerical methods (e.g., MATH 4610) is recommended; experience programming in MATLAB, Python, or a similar language.</p>
+  </section>
+
+  <section id="topics">
+    <h2>Tentative schedule</h2>
+    <ul class="topics">
+      <li>LU factorization: Frobenius matrices, existence, and the elimination algorithm</li>
+      <li>Pivoting, permutation matrices, and PA = LU</li>
+      <li>Newton's method for nonlinear systems: derivation and the Jacobian</li>
+      <li>Local convergence theory: the affine-invariant Newton theorem and quadratic convergence</li>
+      <li>Newton's method in practice: monotonicity tests and damping</li>
+      <li>Conditioning of computational problems and condition numbers</li>
+      <li>Floating-point arithmetic: the IEEE standard, machine precision, round-off errors</li>
+      <li>Loss of significant digits; stability and backward stability</li>
+      <li>Vector and matrix norms; conditioning of Ax = b</li>
+      <li>Stability of LU with partial pivoting; the growth factor</li>
+      <li>Polynomial interpolation: the Lagrange form</li>
+      <li>Spline interpolation: cubic splines, optimality, tridiagonal construction</li>
+      <li>B-splines: recursive definition, properties, efficient evaluation</li>
+      <li>Numerical integration: trapezoidal and Simpson rules, compound rules, error estimation</li>
+      <li>Gaussian quadrature, Gauss–Kronrod rules, adaptive quadrature</li>
+      <li>Eigenvalue problems: the characteristic polynomial and similarity transformations</li>
+      <li>Schur's theorem and unitary similarity; Householder reflectors</li>
+      <li>Reduction to Hessenberg form; Givens rotations</li>
+      <li>The QR algorithm: shifts, deflation, and convergence</li>
+      <li>Special topics (time permitting)</li>
+    </ul>
+    <p class="note">Topics are tentative and subject to change; updates will be announced in class and on Canvas.</p>
+  </section>
+
+  <section id="coursenotes">
+    <h2>Course notes</h2>
+    <div class="lectures hw">
+      <div class="lec" id="notesRow">
+        <span class="no">CN</span>
+        <span class="due">Main course material</span>
+      </div>
+    </div>
+    <p class="note">No textbook is required — the course is based on these lecture notes, updated as the semester progresses. The books listed under References are optional supplements.</p>
+  </section>
+
+  <section id="notes">
+    <h2>Lecture slides</h2>
+    <div class="lectures" id="lectureList"></div>
+    <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded.</p>
+  </section>
+
+  <section id="homework">
+    <h2>Homework</h2>
+    <div class="lectures hw" id="hwList"></div>
+    <p class="note">Four assignments, 10% each, combining theoretical problems with programming exercises in MATLAB or Python. PDFs are posted here when assigned; solutions appear after the due date.</p>
+  </section>
+
+  <section id="exams">
+    <h2>Exams</h2>
+    <div class="lectures hw">
+      <div class="lec">
+        <span class="no">MT</span>
+        <span class="due">Date: TBA (in class)</span>
+        <span><a href="https://usu.box.com/s/REPLACE-EXAM-LINK">Exam (PDF, USU login)</a></span>
+        <span><a href="https://usu.box.com/s/REPLACE-SOLN-LINK">Solutions (PDF, USU login)</a></span>
+      </div>
+    </div>
+    <p class="note">One in-class midterm exam around the middle of the semester. The exam paper and solutions are posted on USU Box after the exam; both require a USU sign-in to open.</p>
+  </section>
+
+  <script>
+    // PDFs live in the same GitHub repo as this page, so links are relative.
+    const NOTES_BASE = "";
+
+    // Shows "not yet posted" until the PDF actually exists in the repo.
+    // Works because the page and the PDFs are on the same GitHub Pages site.
+    // When previewing the page locally (file://), links are shown directly.
+    const LOCAL = location.protocol === "file:";
+    function fileLink(url, label) {
+      const span = document.createElement("span");
+      if (LOCAL) { span.innerHTML = `<a href="${url}">${label}</a>`; return span; }
+      span.innerHTML = `<span class="pending">${label} — not yet posted</span>`;
+      fetch(url, { method: "HEAD" })
+        .then(r => { if (r.ok) span.innerHTML = `<a href="${url}">${label}</a>`; })
+        .catch(() => {});
+      return span;
+    }
+
+    // Course notes: upload "course-notes.pdf" to the repo to activate the link.
+    document.getElementById("notesRow")
+      .appendChild(fileLink(`${NOTES_BASE}course-notes.pdf`, "Lecture notes (PDF)"));
+
+    const LECTURES = [
+      ["Aug",""],
+      [1,"Mon, Aug 31"],
+      ["Sep",""],
+      [2,"Wed, Sep 2"],[3,"Fri, Sep 4"],
+      [0,"Mon, Sep 7","Labor Day — no class"],
+      [4,"Wed, Sep 9"],[5,"Fri, Sep 11"],[6,"Mon, Sep 14"],[7,"Wed, Sep 16"],[8,"Fri, Sep 18"],
+      [0,"Mon, Sep 21","No class — instructor travel"],
+      [9,"Wed, Sep 23"],[10,"Fri, Sep 25"],[11,"Mon, Sep 28"],[12,"Wed, Sep 30"],
+      ["Oct",""],
+      [13,"Fri, Oct 2"],[14,"Mon, Oct 5"],[15,"Wed, Oct 7"],
+      [0,"Fri, Oct 9","Fall Break — no class"],
+      [16,"Mon, Oct 12"],[17,"Wed, Oct 14"],[18,"Fri, Oct 16"],[19,"Mon, Oct 19"],[20,"Wed, Oct 21"],
+      [21,"Fri, Oct 23"],[22,"Mon, Oct 26"],[23,"Wed, Oct 28"],[24,"Fri, Oct 30"],
+      ["Nov",""],
+      [25,"Mon, Nov 2"],[26,"Wed, Nov 4"],[27,"Fri, Nov 6"],[28,"Mon, Nov 9"],[29,"Wed, Nov 11"],
+      [30,"Fri, Nov 13"],[31,"Mon, Nov 16"],
+      [0,"Wed, Nov 18","No class — instructor travel"],
+      [32,"Fri, Nov 20"],[33,"Mon, Nov 23"],
+      [0,"Nov 25–27","Thanksgiving Break — no class"],
+      [34,"Mon, Nov 30"],
+      ["Dec",""],
+      [35,"Wed, Dec 2"],[36,"Fri, Dec 4"],[37,"Mon, Dec 7"],[38,"Wed, Dec 9"],[39,"Fri, Dec 11"]
+    ];
+
+    const list = document.getElementById("lectureList");
+    for (const row of LECTURES) {
+      if (typeof row[0] === "string") {           // month divider
+        const m = document.createElement("div");
+        m.className = "month";
+        m.textContent = row[0];
+        list.appendChild(m);
+        continue;
+      }
+      const div = document.createElement("div");
+      div.className = "lec";
+      if (row[0] === 0) {                          // no-class day
+        div.innerHTML = `<span class="no">—</span><span class="date off">${row[1]}</span><span class="off">${row[2]}</span>`;
+      } else {
+        const n = String(row[0]).padStart(2, "0");
+        div.innerHTML = `<span class="no">${n}</span><span class="date">${row[1]}</span>`;
+        div.appendChild(fileLink(`${NOTES_BASE}lec${n}.pdf`, `Lecture ${row[0]} slides (PDF)`));
+      }
+      list.appendChild(div);
+    }
+
+    // Homework: hw1.pdf / hw1-soln.pdf, etc. Adjust due dates as needed.
+    const HW_BASE = NOTES_BASE;
+    const HOMEWORK = [
+      [1, "Due: Fri, Sep 25"],
+      [2, "Due: Fri, Oct 16"],
+      [3, "Due: Fri, Nov 6"],
+      [4, "Due: Fri, Dec 4"]
+    ];
+
+    const hwList = document.getElementById("hwList");
+    for (const [n, due] of HOMEWORK) {
+      const div = document.createElement("div");
+      div.className = "lec";
+      div.innerHTML =
+        `<span class="no">0${n}</span>` +
+        `<span class="due">${due}</span>`;
+      div.appendChild(fileLink(`${HW_BASE}hw${n}.pdf`, `Homework ${n} (PDF)`));
+      div.appendChild(fileLink(`${HW_BASE}hw${n}-soln.pdf`, `Solutions (PDF)`));
+      hwList.appendChild(div);
+    }
+
+    // Midterm links: hidden until the Box placeholders are replaced with real links.
+    document.querySelectorAll('#exams a').forEach(a => {
+      if (a.href.includes("REPLACE")) {
+        const span = document.createElement("span");
+        span.className = "pending";
+        span.textContent = a.textContent.replace(/\s*\(.*\)$/, "") + " — posted after the exam";
+        a.replaceWith(span);
+      }
+    });
+  </script>
+
+  <section id="materials">
+    <h2>References &amp; software</h2>
+    <p><strong>No required textbook.</strong> The course follows the lecture notes posted above. Optional references: <em>Numerical Analysis in Modern Scientific Computing: An Introduction</em>, 2nd ed., Deuflhard &amp; Hohmann; <em>Numerical Linear Algebra</em>, Trefethen &amp; Bau; and <em>An Introduction to Numerical Analysis</em>, 2nd ed., Stoer &amp; Bulirsch.</p>
+    <p><strong>Software.</strong> MATLAB is recommended for implementing algorithms and completing assignments.</p>
+  </section>
+
+  <section id="grading">
+    <h2>Grading</h2>
+    <div class="grade">
+      <div>Homework (4 assignments, 10% each)</div><div class="pct">40%</div>
+      <div>Midterm exam</div><div class="pct">20%</div>
+      <div>Final project</div><div class="pct">40%</div>
+    </div>
+    <p style="margin-top:16px">In lieu of a final exam, each student completes a final project: the implementation and analysis of a numerical method related to the course material, a short written report, and a brief in-class presentation during the last week of classes or the final examination period. Project topics must be approved by the instructor. No exams or quizzes will be given during No-Test Week (December 7–11).</p>
+    <table class="scale">
+      <tr><td class="g">A</td><td class="r">93–100</td><td class="g">B–</td><td class="r">80–82</td><td class="g">C–</td><td class="r">70–72</td></tr>
+      <tr><td class="g">A–</td><td class="r">90–92</td><td class="g">C+</td><td class="r">77–79</td><td class="g">D</td><td class="r">60–69</td></tr>
+      <tr><td class="g">B+</td><td class="r">87–89</td><td class="g">C</td><td class="r">73–76</td><td class="g">F</td><td class="r">0–59</td></tr>
+      <tr><td class="g">B</td><td class="r">83–86</td><td></td><td></td><td></td><td></td></tr>
+    </table>
+  </section>
+
+  <section id="dates">
+    <h2>No-class days &amp; important dates</h2>
+    <ul class="dates">
+      <li>Mon, Sep 7 — Labor Day (university holiday)</li>
+      <li>Mon, Sep 21 — no class (instructor travel)</li>
+      <li>Fri, Oct 9 — Fall Break</li>
+      <li>Wed, Nov 18 — no class (instructor travel)</li>
+      <li>Nov 25–27 — Thanksgiving Break</li>
+      <li>Dec 7–11 — No-Test Week; last day of classes Fri, Dec 11</li>
+      <li>Dec 14–18 — Final examinations</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>MATH 5610/6610 · Fall 2026 · Utah State University</span>
+    <span>Dr. Changhong Mou · Geology 417B</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
