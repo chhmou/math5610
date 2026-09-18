@@ -133,6 +133,41 @@
     .lectures .lec { grid-template-columns: 28px 92px 1fr; gap: 8px; }
   }
 
+  /* per-lecture code links */
+  .lectures .stack { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .lectures .code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .lectures .code .tag {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-right: 8px;
+  }
+  .lectures .code a { color: var(--accent); border-bottom-color: transparent; }
+  .lectures .code a:hover { border-bottom-color: var(--accent); }
+  .lectures .code .sep { color: var(--hairline); margin: 0 3px; }
+
+  /* code index */
+  .codelist .row {
+    display: grid;
+    grid-template-columns: 175px 58px 1fr;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--hairline);
+    align-items: baseline;
+  }
+  .codelist .fname { font-family: "IBM Plex Mono", monospace; font-size: 0.83rem; overflow-wrap: anywhere; }
+  .codelist .lecref { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-soft); }
+  .codelist .desc { font-size: 0.9rem; color: var(--ink-soft); }
+  @media (max-width: 520px) {
+    .codelist .row { grid-template-columns: 1fr; gap: 1px; }
+  }
+
   /* homework list */
   .hw .lec { grid-template-columns: 34px 1fr auto auto; }
   .hw .due { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-soft); }
@@ -236,6 +271,14 @@
     <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded.</p>
   </section>
 
+  <section id="code">
+    <h2>MATLAB code</h2>
+    <div class="codelist" id="codeList"></div>
+    <p class="note">Code shown in lecture lives in the <a id="codeFolderLink" href="#">matlab-code</a>
+    folder of the course repository, and each file is also linked from its lecture above.
+    On GitHub, use the <em>Raw</em> button to download a single file, or clone the repository to get everything.</p>
+  </section>
+
   <section id="homework">
     <h2>Homework</h2>
     <div class="lectures hw" id="hwList"></div>
@@ -276,6 +319,42 @@
     // Course notes: upload "course-notes.pdf" to the repo to activate the link.
     document.getElementById("notesRow")
       .appendChild(fileLink(`${NOTES_BASE}course-notes.pdf`, "Lecture notes (PDF)"));
+
+    // ---- MATLAB code ---------------------------------------------------
+    // The .m files live in the matlab-code/ folder of this same repository.
+    // CHECK THESE THREE once: GH_USER must be the repository *owner*.
+    const GH_USER   = "chhmou";
+    const GH_REPO   = "math5610";
+    const GH_BRANCH = "main";
+    const CODE_DIR  = "matlab-code";
+
+    const codeFolderURL = `https://github.com/${GH_USER}/${GH_REPO}/tree/${GH_BRANCH}/${CODE_DIR}`;
+    const codeURL = f => `https://github.com/${GH_USER}/${GH_REPO}/blob/${GH_BRANCH}/${CODE_DIR}/${f}`;
+
+    // ONE place to edit: [file name, lecture number, one-line description].
+    // Adding a row here puts the file in the code index below *and* on that
+    // lecture's row above.
+    const CODE_FILES = [
+      ["dampnewton.m",       8, "damped Newton with the monotonicity test"],
+      ["demo_damping.m",     8, "two test cases: arctan, and circle \u2229 parabola"],
+      ["demo_conditioning.m", 8, "how many digits survive an ill-conditioned solve"]
+    ];
+
+    const CODE_BY_LECTURE = {};
+    for (const [file, lec] of CODE_FILES) {
+      (CODE_BY_LECTURE[lec] = CODE_BY_LECTURE[lec] || []).push(file);
+    }
+
+    function codeLine(lec) {
+      const files = CODE_BY_LECTURE[lec];
+      if (!files) return null;
+      const div = document.createElement("div");
+      div.className = "code";
+      div.innerHTML = `<span class="tag">MATLAB</span> ` + files
+        .map(f => `<a href="${codeURL(f)}" target="_blank" rel="noopener">${f}</a>`)
+        .join(` <span class="sep">\u00b7</span> `);
+      return div;
+    }
 
     const LECTURES = [
       ["Aug",""],
@@ -318,9 +397,30 @@
       } else {
         const n = String(row[0]).padStart(2, "0");
         div.innerHTML = `<span class="no">${n}</span><span class="date">${row[1]}</span>`;
-        div.appendChild(fileLink(`${NOTES_BASE}lec${n}.pdf`, `Lecture ${row[0]} slides (PDF)`));
+        const stack = document.createElement("span");
+        stack.className = "stack";
+        stack.appendChild(fileLink(`${NOTES_BASE}lec${n}.pdf`, `Lecture ${row[0]} slides (PDF)`));
+        const cl = codeLine(row[0]);
+        if (cl) stack.appendChild(cl);
+        div.appendChild(stack);
       }
       list.appendChild(div);
+    }
+
+    // Code index section.
+    document.getElementById("codeFolderLink").href = codeFolderURL;
+    document.getElementById("codeFolderLink").target = "_blank";
+    document.getElementById("codeFolderLink").rel = "noopener";
+
+    const codeList = document.getElementById("codeList");
+    for (const [file, lec, desc] of CODE_FILES) {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        `<span class="fname"><a href="${codeURL(file)}" target="_blank" rel="noopener">${file}</a></span>` +
+        `<span class="lecref">Lec ${String(lec).padStart(2, "0")}</span>` +
+        `<span class="desc">${desc}</span>`;
+      codeList.appendChild(row);
     }
 
     // Homework: hw1.pdf / hw1-soln.pdf, etc. Adjust due dates as needed.
