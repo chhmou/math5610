@@ -16,6 +16,8 @@
     --paper: #ffffff;
     --hairline: #e3e7ec;
     --wash: #f5f7f9;
+    --hw: #b45309;
+    --hw-wash: #fdf4e7;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -129,8 +131,35 @@
     padding: 22px 0 4px;
   }
   .lectures .month:first-child { padding-top: 0; }
+  /* homework due dates highlighted inside the lecture schedule */
+  .lectures .lec.hwdue {
+    grid-template-columns: 34px 110px 1fr auto;
+    background: var(--hw-wash);
+    box-shadow: inset 3px 0 0 var(--hw);
+    margin-left: -11px;
+    padding-left: 11px;
+    margin-right: -10px;
+    padding-right: 10px;
+  }
+  .hw-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hw);
+    border: 1px solid var(--hw);
+    border-radius: 999px;
+    padding: 1px 9px;
+    white-space: nowrap;
+    align-self: center;
+  }
+  a.hw-badge:hover { background: var(--hw); color: #fff; }
+  a.hw-badge:focus-visible { outline: 2px solid var(--hw); outline-offset: 2px; }
+
   @media (max-width: 480px) {
     .lectures .lec { grid-template-columns: 28px 92px 1fr; gap: 8px; }
+    .lectures .lec.hwdue { grid-template-columns: 28px 92px 1fr; }
+    .lectures .lec.hwdue .hw-badge { grid-column: 3; justify-self: start; margin-top: 4px; }
   }
 
   /* per-lecture code links */
@@ -238,6 +267,20 @@
     <p><strong>Prerequisites.</strong> Linear algebra and advanced calculus/introductory analysis at the undergraduate level; an undergraduate course in numerical methods (e.g., MATH 4610) is recommended; experience programming in MATLAB, Python, or a similar language.</p>
   </section>
 
+  <section id="notes">
+    <h2>Lecture slides</h2>
+    <div class="lectures" id="lectureList"></div>
+    <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded. Shaded rows mark homework due dates.</p>
+  </section>
+
+  <section id="code">
+    <h2>MATLAB code</h2>
+    <div class="codelist" id="codeList"></div>
+    <p class="note">Code shown in lecture lives in the <a id="codeFolderLink" href="#">matlab-code</a>
+    folder of the course repository, and each file is also linked from its lecture above.
+    On GitHub, use the <em>Raw</em> button to download a single file, or clone the repository to get everything.</p>
+  </section>
+
   <section id="topics">
     <h2>Tentative schedule</h2>
     <ul class="topics">
@@ -263,20 +306,6 @@
       <li>Special topics (time permitting)</li>
     </ul>
     <p class="note">Topics are tentative and subject to change; updates will be announced in class and on Canvas.</p>
-  </section>
-
-  <section id="notes">
-    <h2>Lecture slides</h2>
-    <div class="lectures" id="lectureList"></div>
-    <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded.</p>
-  </section>
-
-  <section id="code">
-    <h2>MATLAB code</h2>
-    <div class="codelist" id="codeList"></div>
-    <p class="note">Code shown in lecture lives in the <a id="codeFolderLink" href="#">matlab-code</a>
-    folder of the course repository, and each file is also linked from its lecture above.
-    On GitHub, use the <em>Raw</em> button to download a single file, or clone the repository to get everything.</p>
   </section>
 
   <section id="homework">
@@ -381,6 +410,18 @@
       [35,"Wed, Dec 2"],[36,"Fri, Dec 4"],[37,"Mon, Dec 7"],[38,"Wed, Dec 9"],[39,"Fri, Dec 11"]
     ];
 
+    // Each due date below is also highlighted on the matching day in the lecture
+    // schedule -- the date strings must match the ones used in LECTURES exactly.
+    const HW_BASE = NOTES_BASE;
+    const HOMEWORK = [
+      [1, "Due: Fri, Sep 25"],
+      [2, "Due: Fri, Oct 16"],
+      [3, "Due: Fri, Nov 6"],
+      [4, "Due: Fri, Dec 4"]
+    ];
+    const HW_BY_DATE = {};
+    for (const [n, due] of HOMEWORK) HW_BY_DATE[due.replace(/^Due:\s*/, "")] = n;
+
     const list = document.getElementById("lectureList");
     for (const row of LECTURES) {
       if (typeof row[0] === "string") {           // month divider
@@ -403,6 +444,15 @@
         const cl = codeLine(row[0]);
         if (cl) stack.appendChild(cl);
         div.appendChild(stack);
+        const hw = HW_BY_DATE[row[1]];
+        if (hw) {
+          div.classList.add("hwdue");
+          const badge = document.createElement("a");
+          badge.className = "hw-badge";
+          badge.href = "#homework";
+          badge.textContent = `HW ${hw} due`;
+          div.appendChild(badge);
+        }
       }
       list.appendChild(div);
     }
@@ -424,13 +474,6 @@
     }
 
     // Homework: hw1.pdf / hw1-soln.pdf, etc. Adjust due dates as needed.
-    const HW_BASE = NOTES_BASE;
-    const HOMEWORK = [
-      [1, "Due: Fri, Sep 25"],
-      [2, "Due: Fri, Oct 16"],
-      [3, "Due: Fri, Nov 6"],
-      [4, "Due: Fri, Dec 4"]
-    ];
 
     const hwList = document.getElementById("hwList");
     for (const [n, due] of HOMEWORK) {
