@@ -18,6 +18,7 @@
     --wash: #f5f7f9;
     --hw: #b45309;
     --hw-wash: #fdf4e7;
+    --ev-wash: #eaf1fa;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -156,10 +157,35 @@
   a.hw-badge:hover { background: var(--hw); color: #fff; }
   a.hw-badge:focus-visible { outline: 2px solid var(--hw); outline-offset: 2px; }
 
+  /* midterm and final-presentation days inside the lecture schedule */
+  .lectures .lec.event {
+    grid-template-columns: 34px 110px 1fr auto;
+    background: var(--ev-wash);
+    box-shadow: inset 3px 0 0 var(--accent);
+    margin-left: -11px;
+    padding-left: 11px;
+    margin-right: -10px;
+    padding-right: 10px;
+  }
+  .lectures .lec.event .what { font-weight: 600; color: var(--aggie); }
+  .ev-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 1px 9px;
+    white-space: nowrap;
+    align-self: center;
+  }
+  a.ev-badge:hover { background: var(--accent); color: #fff; }
+
   @media (max-width: 480px) {
     .lectures .lec { grid-template-columns: 28px 92px 1fr; gap: 8px; }
-    .lectures .lec.hwdue { grid-template-columns: 28px 92px 1fr; }
-    .lectures .lec.hwdue .hw-badge { grid-column: 3; justify-self: start; margin-top: 4px; }
+    .lectures .lec.hwdue, .lectures .lec.event { grid-template-columns: 28px 92px 1fr; }
+    .lectures .lec.hwdue .hw-badge, .lectures .lec.event .ev-badge { grid-column: 3; justify-self: start; margin-top: 4px; }
   }
 
   /* per-lecture code links */
@@ -270,7 +296,7 @@
   <section id="notes">
     <h2>Lecture slides</h2>
     <div class="lectures" id="lectureList"></div>
-    <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded. Shaded rows mark homework due dates.</p>
+    <p class="note">Slides are posted as PDFs after each lecture; a link goes live once the file is uploaded. Amber rows mark homework due dates; blue rows mark the midterm and the final project presentations.</p>
   </section>
 
   <section id="code">
@@ -319,12 +345,12 @@
     <div class="lectures hw">
       <div class="lec">
         <span class="no">MT</span>
-        <span class="due">Date: TBA (in class)</span>
+        <span class="due">Fri, Oct 30 (in class)</span>
         <span><a href="https://usu.box.com/s/REPLACE-EXAM-LINK">Exam (PDF, USU login)</a></span>
         <span><a href="https://usu.box.com/s/REPLACE-SOLN-LINK">Solutions (PDF, USU login)</a></span>
       </div>
     </div>
-    <p class="note">One in-class midterm exam around the middle of the semester. The exam paper and solutions are posted on USU Box after the exam; both require a USU sign-in to open.</p>
+    <p class="note">One in-class midterm exam on Friday, October 30, during the regular class time (10:30–11:20 a.m., Old Main 203). The exam paper and solutions are posted on USU Box after the exam; both require a USU sign-in to open.</p>
   </section>
 
   <script>
@@ -365,7 +391,7 @@
     // lecture's row above.
     const CODE_FILES = [
       ["dampnewton.m",       8, "damped Newton with the monotonicity test"],
-      ["demo_damping.m",     8, "two test cases: arctan, and circle \u2229 parabola"],
+      ["demo_damping.m",     8, "two test cases: arctan, and circle ∩ parabola"],
       ["demo_conditioning.m", 8, "how many digits survive an ill-conditioned solve"]
     ];
 
@@ -381,10 +407,15 @@
       div.className = "code";
       div.innerHTML = `<span class="tag">MATLAB</span> ` + files
         .map(f => `<a href="${codeURL(f)}" target="_blank" rel="noopener">${f}</a>`)
-        .join(` <span class="sep">\u00b7</span> `);
+        .join(` <span class="sep">·</span> `);
       return div;
     }
 
+    // Row types:
+    //   ["Mon",""]                         month divider
+    //   [n, "date"]                        lecture n (slides: lecNN.pdf)
+    //   [0, "date", "text"]                no class
+    //   [-1, "date", "text", "tag", "#id"] exam / presentation day (blue row)
     const LECTURES = [
       ["Aug",""],
       [1,"Mon, Aug 31"],
@@ -398,16 +429,20 @@
       [13,"Fri, Oct 2"],[14,"Mon, Oct 5"],[15,"Wed, Oct 7"],
       [0,"Fri, Oct 9","Fall Break — no class"],
       [16,"Mon, Oct 12"],[17,"Wed, Oct 14"],[18,"Fri, Oct 16"],[19,"Mon, Oct 19"],[20,"Wed, Oct 21"],
-      [21,"Fri, Oct 23"],[22,"Mon, Oct 26"],[23,"Wed, Oct 28"],[24,"Fri, Oct 30"],
+      [21,"Fri, Oct 23"],[22,"Mon, Oct 26"],[23,"Wed, Oct 28"],
+      [-1,"Fri, Oct 30","Midterm exam (in class)","Midterm","#exams"],
       ["Nov",""],
-      [25,"Mon, Nov 2"],[26,"Wed, Nov 4"],[27,"Fri, Nov 6"],[28,"Mon, Nov 9"],[29,"Wed, Nov 11"],
-      [30,"Fri, Nov 13"],[31,"Mon, Nov 16"],
+      [24,"Mon, Nov 2"],[25,"Wed, Nov 4"],[26,"Fri, Nov 6"],[27,"Mon, Nov 9"],[28,"Wed, Nov 11"],
+      [29,"Fri, Nov 13"],[30,"Mon, Nov 16"],
       [0,"Wed, Nov 18","No class — instructor travel"],
-      [32,"Fri, Nov 20"],[33,"Mon, Nov 23"],
+      [31,"Fri, Nov 20"],[32,"Mon, Nov 23"],
       [0,"Nov 25–27","Thanksgiving Break — no class"],
-      [34,"Mon, Nov 30"],
+      [33,"Mon, Nov 30"],
       ["Dec",""],
-      [35,"Wed, Dec 2"],[36,"Fri, Dec 4"],[37,"Mon, Dec 7"],[38,"Wed, Dec 9"],[39,"Fri, Dec 11"]
+      [34,"Wed, Dec 2"],[35,"Fri, Dec 4"],
+      [-1,"Mon, Dec 7","Final project presentations (1/3)","Presentations","#grading"],
+      [-1,"Wed, Dec 9","Final project presentations (2/3)","Presentations","#grading"],
+      [-1,"Fri, Dec 11","Final project presentations (3/3)","Presentations","#grading"]
     ];
 
     // Each due date below is also highlighted on the matching day in the lecture
@@ -435,6 +470,12 @@
       div.className = "lec";
       if (row[0] === 0) {                          // no-class day
         div.innerHTML = `<span class="no">—</span><span class="date off">${row[1]}</span><span class="off">${row[2]}</span>`;
+      } else if (row[0] === -1) {                  // exam / presentation day
+        div.classList.add("event");
+        div.innerHTML =
+          `<span class="no">—</span><span class="date">${row[1]}</span>` +
+          `<span class="what">${row[2]}</span>` +
+          `<a class="ev-badge" href="${row[4]}">${row[3]}</a>`;
       } else {
         const n = String(row[0]).padStart(2, "0");
         div.innerHTML = `<span class="no">${n}</span><span class="date">${row[1]}</span>`;
@@ -508,10 +549,10 @@
     <h2>Grading</h2>
     <div class="grade">
       <div>Homework (4 assignments, 10% each)</div><div class="pct">40%</div>
-      <div>Midterm exam</div><div class="pct">20%</div>
+      <div>Midterm exam (Fri, Oct 30, in class)</div><div class="pct">20%</div>
       <div>Final project</div><div class="pct">40%</div>
     </div>
-    <p style="margin-top:16px">In lieu of a final exam, each student completes a final project: the implementation and analysis of a numerical method related to the course material, a short written report, and a brief in-class presentation during the last week of classes or the final examination period. Project topics must be approved by the instructor. No exams or quizzes will be given during No-Test Week (December 7–11).</p>
+    <p style="margin-top:16px">In lieu of a final exam, each student completes a final project: the implementation and analysis of a numerical method related to the course material, a short written report, and a brief in-class presentation during the last three class meetings (Mon, Dec 7; Wed, Dec 9; Fri, Dec 11). Project topics must be approved by the instructor. No exams or quizzes will be given during No-Test Week (December 7–11).</p>
     <table class="scale">
       <tr><td class="g">A</td><td class="r">93–100</td><td class="g">B–</td><td class="r">80–82</td><td class="g">C–</td><td class="r">70–72</td></tr>
       <tr><td class="g">A–</td><td class="r">90–92</td><td class="g">C+</td><td class="r">77–79</td><td class="g">D</td><td class="r">60–69</td></tr>
@@ -526,8 +567,10 @@
       <li>Mon, Sep 7 — Labor Day (university holiday)</li>
       <li>Mon, Sep 21 — no class (instructor travel)</li>
       <li>Fri, Oct 9 — Fall Break</li>
+      <li>Fri, Oct 30 — Midterm exam (in class)</li>
       <li>Wed, Nov 18 — no class (instructor travel)</li>
       <li>Nov 25–27 — Thanksgiving Break</li>
+      <li>Dec 7, 9, 11 — Final project presentations (in class)</li>
       <li>Dec 7–11 — No-Test Week; last day of classes Fri, Dec 11</li>
       <li>Dec 14–18 — Final examinations</li>
     </ul>
