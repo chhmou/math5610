@@ -414,6 +414,7 @@
     // Row types:
     //   ["Mon",""]                         month divider
     //   [n, "date"]                        lecture n (slides: lecNN.pdf)
+    //   [n, "date", "note"]                lecture n with a note (e.g. online)
     //   [0, "date", "text"]                no class
     //   [-1, "date", "text", "tag", "#id"] exam / presentation day (blue row)
     const LECTURES = [
@@ -433,13 +434,15 @@
       [-1,"Fri, Oct 30","Midterm exam (in class)","Midterm","#exams"],
       ["Nov",""],
       [24,"Mon, Nov 2"],[25,"Wed, Nov 4"],[26,"Fri, Nov 6"],[27,"Mon, Nov 9"],[28,"Wed, Nov 11"],
-      [29,"Fri, Nov 13"],[30,"Mon, Nov 16"],
+      [29,"Fri, Nov 13"],
+      [30,"Mon, Nov 16",'Online via <a href="https://usu.zoom.us/j/88337030763?pwd=PFnKxFhJh4yjiEFklmXcNswLVIajn1.1">Zoom</a> at the usual time (Meeting ID 883 3703 0763, passcode 193840)'],
       [0,"Wed, Nov 18","No class — instructor travel"],
-      [31,"Fri, Nov 20"],[32,"Mon, Nov 23"],
+      [0,"Fri, Nov 20","No class — canceled"],
+      [31,"Mon, Nov 23"],
       [0,"Nov 25–27","Thanksgiving Break — no class"],
-      [33,"Mon, Nov 30"],
+      [32,"Mon, Nov 30"],
       ["Dec",""],
-      [34,"Wed, Dec 2"],[35,"Fri, Dec 4"],
+      [33,"Wed, Dec 2"],[34,"Fri, Dec 4"],
       [-1,"Mon, Dec 7","Final project presentations","Presentations","#grading"],
       [-1,"Wed, Dec 9","Final project presentations","Presentations","#grading"],
       [-1,"Fri, Dec 11","Final project presentations","Presentations","#grading"]
@@ -482,6 +485,12 @@
         const stack = document.createElement("span");
         stack.className = "stack";
         stack.appendChild(fileLink(`${NOTES_BASE}lec${n}.pdf`, `Lecture ${row[0]} slides (PDF)`));
+        if (row[2]) {                              // optional note, e.g. an online meeting
+          const note = document.createElement("span");
+          note.style.fontSize = "0.85rem";
+          note.innerHTML = row[2];
+          stack.appendChild(note);
+        }
         const cl = codeLine(row[0]);
         if (cl) stack.appendChild(cl);
         div.appendChild(stack);
@@ -568,7 +577,9 @@
       <li>Mon, Sep 21 — no class (instructor travel)</li>
       <li>Fri, Oct 9 — Fall Break</li>
       <li>Fri, Oct 30 — Midterm exam (in class)</li>
+      <li>Mon, Nov 16 — class online via <a href="https://usu.zoom.us/j/88337030763?pwd=PFnKxFhJh4yjiEFklmXcNswLVIajn1.1">Zoom</a> (usual time)</li>
       <li>Wed, Nov 18 — no class (instructor travel)</li>
+      <li>Fri, Nov 20 — no class (canceled)</li>
       <li>Nov 25–27 — Thanksgiving Break</li>
       <li>Dec 7, 9, 11 — Final project presentations (in class)</li>
       <li>Dec 7–11 — No-Test Week; last day of classes Fri, Dec 11</li>
